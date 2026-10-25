@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Settlement from '@/components/Settlement';
 import { supabase } from '@/lib/supabase';
 import { useRoom } from '@/lib/useRoom';
 import Sidebar from '@/components/Sidebar';
@@ -56,6 +57,7 @@ export default function Lobby({ roomId, me, room }: { roomId: string; me: string
             {err && <p role="alert" className="text-sm text-red-400">{err}</p>}
             <button disabled={!opp} onClick={start} className="w-full rounded-lg bg-emerald-600 py-2.5 font-bold enabled:hover:bg-emerald-500 disabled:opacity-40">Start game</button>
           </section>)}
+        <Settlement roomId={roomId} me={me} members={members} wallets={wallets} settlementDate={room.settlement_date} />
       </main>
     </div>
   );
