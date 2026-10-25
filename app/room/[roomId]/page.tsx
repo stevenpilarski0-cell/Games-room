@@ -8,12 +8,12 @@ import Lobby, { type RoomInfo } from '@/components/Lobby';
 
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
+  const [member, setMember] = useState(false);
   const [me, setMe] = useState('');
   const [room, setRoom] = useState<RoomInfo | null>(null);
   const [invite, setInvite] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -24,14 +24,14 @@ export default function RoomPage() {
         const user = await ensureSession();
         setMe(user.id);
 
-        const { data: mem } = await supabase
+        const { data: existingMember } = await supabase
           .from('room_members')
           .select('user_id')
           .eq('room_id', roomId)
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (mem) {
+        if (existingMember) {
           const { data, error: e } = await supabase
             .from('rooms')
             .select('settlement_date, invite_token')
@@ -39,7 +39,7 @@ export default function RoomPage() {
             .single();
           if (e) throw new Error(e.message);
           setRoom(data);
-          setIsMember(true);
+          setMember(true);
           return;
         }
 
@@ -74,7 +74,7 @@ export default function RoomPage() {
     return <main className="flex min-h-screen items-center justify-center p-6 text-red-400">{error}</main>;
   }
 
-  if (isMember && room) {
+  if (member && room) {
     return <Lobby roomId={roomId} me={me} room={room} />;
   }
 
